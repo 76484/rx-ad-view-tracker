@@ -1,5 +1,5 @@
 import { concat, from, Observable, of, timer } from "rxjs";
-import { map, mergeMap, switchMap, takeWhile } from "rxjs/operators";
+import { filter, map, mergeMap, switchMap, takeWhile } from "rxjs/operators";
 
 const fromAdEl = (el, index) => {
   const text = el.innerText;
@@ -36,19 +36,21 @@ from(adEls)
     mergeMap((adEl, index) =>
       fromAdEl(adEl, index).pipe(
         switchMap((watchedAd) => {
-          if (watchedAd.isInersecting) {
-            return concat(
-              of(watchedAd),
-              timer(1100).pipe(
-                map(() => ({
-                  ...watchedAd,
-                  isViewed: true,
-                }))
-              )
-            );
-          }
-
-          return of(watchedAd);
+          return concat(
+            of(watchedAd),
+            of(watchedAd).pipe(
+              filter((watchedAd) => watchedAd.isInersecting),
+              mergeMap(() => {
+                // watchedAd is viewed if is intersecting for > 1 continuous second
+                return timer(1010).pipe(
+                  map(() => ({
+                    ...watchedAd,
+                    isViewed: true,
+                  }))
+                );
+              })
+            )
+          );
         }),
         takeWhile((watchedAd) => !watchedAd.isViewed, true)
       )
