@@ -12,5 +12,9 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     clean: true,
   },
-  plugins: [new HtmlWebpackPlugin()],
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "templates/index.html"),
+    }),
+  ],
 };
