@@ -56,13 +56,16 @@ from(adEls)
       )
     )
   )
-  .subscribe((watchedAd) => {
-    const el = adEls[watchedAd.index];
+  .subscribe({
+    next: (watchedAd) => {
+      const el = adEls[watchedAd.index];
 
-    el.classList.toggle("in-view", watchedAd.isInersecting);
+      el.classList.toggle("in-view", watchedAd.isInersecting);
 
-    if (watchedAd.isViewed) {
-      console.log(`track ${watchedAd.text}`);
-      el.classList.add("tracked");
-    }
+      if (watchedAd.isViewed) {
+        console.log(`track ${watchedAd.text}`);
+        el.classList.add("tracked");
+      }
+    },
+    complete: () => console.log("-- All ads tracked"),
   });
